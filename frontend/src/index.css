@@ -1,0 +1,84 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root,
+[data-theme='dark'] {
+  --dcs-bg: #0f1419;
+  --dcs-surface: #1a2332;
+  --dcs-border: #2d3a4f;
+  --dcs-accent: #3b82f6;
+  --dcs-accent-hover: #2563eb;
+  --dcs-text: #e2e8f0;
+  --dcs-muted: #94a3b8;
+  --dcs-canvas-dots: #2d3a4f;
+  --dcs-minimap-mask: rgba(15, 20, 25, 0.8);
+}
+
+[data-theme='light'] {
+  --dcs-bg: #f1f5f9;
+  --dcs-surface: #ffffff;
+  --dcs-border: #e2e8f0;
+  --dcs-accent: #2563eb;
+  --dcs-accent-hover: #1d4ed8;
+  --dcs-text: #0f172a;
+  --dcs-muted: #64748b;
+  --dcs-canvas-dots: #cbd5e1;
+  --dcs-minimap-mask: rgba(241, 245, 249, 0.85);
+}
+
+@layer base {
+  * {
+    @apply border-dcs-border;
+  }
+
+  body {
+    @apply overflow-hidden bg-dcs-bg text-dcs-text;
+  }
+}
+
+.react-flow__node-serviceNode {
+  @apply rounded-lg border border-dcs-border bg-dcs-surface shadow-lg;
+}
+
+.react-flow__edge-path {
+  stroke: var(--dcs-accent);
+  stroke-width: 2;
+}
+
+.react-flow__controls {
+  @apply rounded-lg border border-dcs-border bg-dcs-surface shadow-lg;
+}
+
+.react-flow__controls-button {
+  @apply border-dcs-border bg-dcs-surface text-dcs-text;
+}
+
+.react-flow__controls-button:hover {
+  @apply bg-dcs-border;
+}
+
+.react-flow__minimap {
+  @apply rounded-lg border border-dcs-border bg-dcs-surface;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply rounded-full bg-dcs-border;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-dcs-muted;
+}
+
+.input-field {
+  @apply w-full rounded-md border border-dcs-border bg-dcs-bg px-2.5 py-1.5 text-sm text-dcs-text outline-none transition-colors focus:border-dcs-accent;
+}

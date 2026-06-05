@@ -1,0 +1,17 @@
+{
+  "name": "Kafka Cluster",
+  "category": "messaging",
+  "description": "Kafka with Zookeeper for event-driven development",
+  "topology": {
+    "nodes": [
+      {"id": "svc-zookeeper-0", "type": "serviceNode", "position": {"x": 100, "y": 100}, "data": {"catalogId": "zookeeper", "name": "zookeeper", "image": "confluentinc/cp-zookeeper:7.6.0", "ports": [{"host": 2181, "container": 2181}], "environment": {"ZOOKEEPER_CLIENT_PORT": "2181", "ZOOKEEPER_TICK_TIME": "2000"}}},
+      {"id": "svc-kafka-1", "type": "serviceNode", "position": {"x": 350, "y": 100}, "data": {"catalogId": "kafka", "name": "kafka", "image": "confluentinc/cp-kafka:7.6.0", "ports": [{"host": 9092, "container": 9092}], "environment": {"KAFKA_BROKER_ID": "1", "KAFKA_ZOOKEEPER_CONNECT": "zookeeper:2181", "KAFKA_ADVERTISED_LISTENERS": "PLAINTEXT://kafka:9092", "KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR": "1"}}},
+      {"id": "svc-kafka-ui-2", "type": "serviceNode", "position": {"x": 600, "y": 100}, "data": {"catalogId": "custom", "name": "kafka-ui", "image": "provectuslabs/kafka-ui:latest", "ports": [{"host": 8090, "container": 8080}], "environment": {"KAFKA_CLUSTERS_0_NAME": "local", "KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS": "kafka:9092", "KAFKA_CLUSTERS_0_ZOOKEEPER": "zookeeper:2181"}}}
+    ],
+    "edges": [
+      {"id": "e-kafka-zk", "source": "svc-kafka-1", "target": "svc-zookeeper-0", "type": "dependency"},
+      {"id": "e-ui-kafka", "source": "svc-kafka-ui-2", "target": "svc-kafka-1", "type": "dependency"}
+    ]
+  },
+  "composeYaml": ""
+}

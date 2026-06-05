@@ -1,0 +1,72 @@
+{
+  "name": "RAG Development Environment",
+  "category": "ai",
+  "description": "Local RAG stack with Ollama, Open WebUI, Qdrant and PostgreSQL",
+  "topology": {
+    "nodes": [
+      {
+        "id": "svc-ollama-0",
+        "type": "serviceNode",
+        "position": {"x": 100, "y": 100},
+        "data": {
+          "catalogId": "ollama",
+          "name": "ollama",
+          "image": "ollama/ollama:latest",
+          "ports": [{"host": 11434, "container": 11434}],
+          "volumes": [{"name": "ollamadata", "path": "/root/.ollama"}]
+        }
+      },
+      {
+        "id": "svc-openwebui-1",
+        "type": "serviceNode",
+        "position": {"x": 350, "y": 100},
+        "data": {
+          "catalogId": "openwebui",
+          "name": "openwebui",
+          "image": "ghcr.io/open-webui/open-webui:main",
+          "ports": [{"host": 3001, "container": 8080}],
+          "volumes": [{"name": "webuidata", "path": "/app/backend/data"}],
+          "environment": {"OLLAMA_BASE_URL": "http://ollama:11434"}
+        }
+      },
+      {
+        "id": "svc-qdrant-2",
+        "type": "serviceNode",
+        "position": {"x": 600, "y": 100},
+        "data": {
+          "catalogId": "qdrant",
+          "name": "qdrant",
+          "image": "qdrant/qdrant:latest",
+          "ports": [{"host": 6333, "container": 6333}],
+          "volumes": [{"name": "qdrantdata", "path": "/qdrant/storage"}]
+        }
+      },
+      {
+        "id": "svc-postgresql-3",
+        "type": "serviceNode",
+        "position": {"x": 350, "y": 280},
+        "data": {
+          "catalogId": "postgresql",
+          "name": "postgres",
+          "image": "postgres:16-alpine",
+          "ports": [{"host": 5432, "container": 5432}],
+          "volumes": [{"name": "pgdata", "path": "/var/lib/postgresql/data"}],
+          "environment": {
+            "POSTGRES_USER": "rag",
+            "POSTGRES_PASSWORD": "secret",
+            "POSTGRES_DB": "ragdb"
+          },
+          "healthcheck": {
+            "test": ["CMD-SHELL", "pg_isready -U rag -d ragdb"],
+            "interval": "10s",
+            "retries": 5
+          }
+        }
+      }
+    ],
+    "edges": [
+      {"id": "e-webui-ollama", "source": "svc-openwebui-1", "target": "svc-ollama-0", "type": "dependency"}
+    ]
+  },
+  "composeYaml": ""
+}

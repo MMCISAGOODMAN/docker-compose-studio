@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+frontend/node_modules/
+backend/target/
+
+# Build
+frontend/dist/
+*.jar
+*.class
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+.DS_Store
+
+# Env
+.env
+.env.local
+*.log
+
+# OS
+Thumbs.db
+
+# WeChat article (local only, not pushed)
+wechat-article/
+
+# Maven wrapper (generated)
+backend/.mvn/wrapper/maven-wrapper.jar

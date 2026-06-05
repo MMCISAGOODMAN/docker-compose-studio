@@ -1,0 +1,48 @@
+spring:
+  application:
+    name: docker-compose-studio
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:dcs}
+    username: ${DB_USER:dcs}
+    password: ${DB_PASSWORD:dcs}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+  flyway:
+    enabled: true
+
+server:
+  port: ${SERVER_PORT:8080}
+
+dcs:
+  docker:
+    enabled: ${DOCKER_ENABLED:true}
+    host: ${DOCKER_HOST:unix:///var/run/docker.sock}
+    deploy-dir: ${DOCKER_DEPLOY_DIR:${java.io.tmpdir}/dcs-deployments}
+  ai:
+    mode: ${AI_MODE:auto}
+    llm: ${AI_LLM:ollama}
+    ollama:
+      base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
+      model: ${OLLAMA_MODEL:llama3.2}
+      timeout-seconds: ${OLLAMA_TIMEOUT_SECONDS:90}
+    openai:
+      base-url: ${OPENAI_BASE_URL:https://api.openai.com/v1}
+      api-key: ${OPENAI_API_KEY:}
+      model: ${OPENAI_MODEL:gpt-4o-mini}
+      timeout-seconds: ${OPENAI_TIMEOUT_SECONDS:90}
+  cors:
+    allowed-origins: ${CORS_ORIGINS:http://localhost:5173,http://localhost:3000}
+
+logging:
+  level:
+    com.dockercompose.studio: INFO

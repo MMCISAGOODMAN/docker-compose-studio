@@ -1,0 +1,63 @@
+{
+  "name": "Python Dev Environment",
+  "category": "dev",
+  "description": "Python FastAPI/Django stack with PostgreSQL and Redis",
+  "topology": {
+    "nodes": [
+      {
+        "id": "svc-python-0",
+        "type": "serviceNode",
+        "position": {"x": 100, "y": 100},
+        "data": {
+          "catalogId": "python",
+          "name": "api",
+          "image": "python:3.12-slim",
+          "ports": [{"host": 8000, "container": 8000}],
+          "environment": {
+            "DATABASE_URL": "postgresql://app:secret@postgres:5432/appdb",
+            "REDIS_URL": "redis://redis:6379"
+          }
+        }
+      },
+      {
+        "id": "svc-postgresql-1",
+        "type": "serviceNode",
+        "position": {"x": 350, "y": 100},
+        "data": {
+          "catalogId": "postgresql",
+          "name": "postgres",
+          "image": "postgres:16-alpine",
+          "ports": [{"host": 5432, "container": 5432}],
+          "volumes": [{"name": "pgdata", "path": "/var/lib/postgresql/data"}],
+          "environment": {
+            "POSTGRES_USER": "app",
+            "POSTGRES_PASSWORD": "secret",
+            "POSTGRES_DB": "appdb"
+          },
+          "healthcheck": {
+            "test": ["CMD-SHELL", "pg_isready -U app -d appdb"],
+            "interval": "10s",
+            "retries": 5
+          }
+        }
+      },
+      {
+        "id": "svc-redis-2",
+        "type": "serviceNode",
+        "position": {"x": 600, "y": 100},
+        "data": {
+          "catalogId": "redis",
+          "name": "redis",
+          "image": "redis:7-alpine",
+          "ports": [{"host": 6379, "container": 6379}],
+          "volumes": [{"name": "redisdata", "path": "/data"}]
+        }
+      }
+    ],
+    "edges": [
+      {"id": "e-api-postgres", "source": "svc-python-0", "target": "svc-postgresql-1", "type": "dependency"},
+      {"id": "e-api-redis", "source": "svc-python-0", "target": "svc-redis-2", "type": "dependency"}
+    ]
+  },
+  "composeYaml": ""
+}

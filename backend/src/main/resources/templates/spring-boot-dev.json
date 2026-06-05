@@ -1,0 +1,69 @@
+{
+  "name": "Spring Boot Dev Environment",
+  "category": "dev",
+  "description": "Complete Spring Boot development stack with PostgreSQL and Redis",
+  "topology": {
+    "nodes": [
+      {
+        "id": "svc-springboot-0",
+        "type": "serviceNode",
+        "position": {"x": 100, "y": 100},
+        "data": {
+          "catalogId": "spring-boot",
+          "name": "app",
+          "image": "eclipse-temurin:21-jdk-alpine",
+          "ports": [{"host": 8080, "container": 8080}],
+          "environment": {
+            "SPRING_PROFILES_ACTIVE": "dev",
+            "SPRING_DATASOURCE_URL": "jdbc:postgresql://postgres:5432/appdb",
+            "SPRING_REDIS_HOST": "redis"
+          }
+        }
+      },
+      {
+        "id": "svc-postgresql-1",
+        "type": "serviceNode",
+        "position": {"x": 350, "y": 100},
+        "data": {
+          "catalogId": "postgresql",
+          "name": "postgres",
+          "image": "postgres:16-alpine",
+          "ports": [{"host": 5432, "container": 5432}],
+          "volumes": [{"name": "pgdata", "path": "/var/lib/postgresql/data"}],
+          "environment": {
+            "POSTGRES_USER": "app",
+            "POSTGRES_PASSWORD": "secret",
+            "POSTGRES_DB": "appdb"
+          },
+          "healthcheck": {
+            "test": ["CMD-SHELL", "pg_isready -U app -d appdb"],
+            "interval": "10s",
+            "retries": 5
+          }
+        }
+      },
+      {
+        "id": "svc-redis-2",
+        "type": "serviceNode",
+        "position": {"x": 600, "y": 100},
+        "data": {
+          "catalogId": "redis",
+          "name": "redis",
+          "image": "redis:7-alpine",
+          "ports": [{"host": 6379, "container": 6379}],
+          "volumes": [{"name": "redisdata", "path": "/data"}],
+          "healthcheck": {
+            "test": ["CMD", "redis-cli", "ping"],
+            "interval": "10s",
+            "retries": 5
+          }
+        }
+      }
+    ],
+    "edges": [
+      {"id": "e-app-postgres", "source": "svc-springboot-0", "target": "svc-postgresql-1", "type": "dependency"},
+      {"id": "e-app-redis", "source": "svc-springboot-0", "target": "svc-redis-2", "type": "dependency"}
+    ]
+  },
+  "composeYaml": ""
+}

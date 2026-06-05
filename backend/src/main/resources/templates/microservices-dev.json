@@ -1,0 +1,23 @@
+{
+  "name": "Microservices Dev Environment",
+  "category": "dev",
+  "description": "Microservices stack with Spring Boot, Kafka, PostgreSQL, Redis and Nginx",
+  "topology": {
+    "nodes": [
+      {"id": "svc-nginx-0", "type": "serviceNode", "position": {"x": 100, "y": 50}, "data": {"catalogId": "nginx", "name": "gateway", "image": "nginx:alpine", "ports": [{"host": 80, "container": 80}]}},
+      {"id": "svc-springboot-1", "type": "serviceNode", "position": {"x": 100, "y": 200}, "data": {"catalogId": "spring-boot", "name": "service-a", "image": "eclipse-temurin:21-jdk-alpine", "ports": [{"host": 8080, "container": 8080}], "environment": {"SPRING_DATASOURCE_URL": "jdbc:postgresql://postgres:5432/appdb", "SPRING_KAFKA_BOOTSTRAP_SERVERS": "kafka:9092"}}},
+      {"id": "svc-postgresql-2", "type": "serviceNode", "position": {"x": 350, "y": 200}, "data": {"catalogId": "postgresql", "name": "postgres", "image": "postgres:16-alpine", "ports": [{"host": 5432, "container": 5432}], "volumes": [{"name": "pgdata", "path": "/var/lib/postgresql/data"}], "environment": {"POSTGRES_USER": "app", "POSTGRES_PASSWORD": "secret", "POSTGRES_DB": "appdb"}, "healthcheck": {"test": ["CMD-SHELL", "pg_isready -U app"], "interval": "10s", "retries": 5}}},
+      {"id": "svc-redis-3", "type": "serviceNode", "position": {"x": 600, "y": 200}, "data": {"catalogId": "redis", "name": "redis", "image": "redis:7-alpine", "ports": [{"host": 6379, "container": 6379}]}},
+      {"id": "svc-kafka-4", "type": "serviceNode", "position": {"x": 350, "y": 380}, "data": {"catalogId": "kafka", "name": "kafka", "image": "confluentinc/cp-kafka:7.6.0", "ports": [{"host": 9092, "container": 9092}], "environment": {"KAFKA_BROKER_ID": "1", "KAFKA_ZOOKEEPER_CONNECT": "zookeeper:2181", "KAFKA_ADVERTISED_LISTENERS": "PLAINTEXT://kafka:9092", "KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR": "1"}}},
+      {"id": "svc-zookeeper-5", "type": "serviceNode", "position": {"x": 100, "y": 380}, "data": {"catalogId": "zookeeper", "name": "zookeeper", "image": "confluentinc/cp-zookeeper:7.6.0", "ports": [{"host": 2181, "container": 2181}], "environment": {"ZOOKEEPER_CLIENT_PORT": "2181", "ZOOKEEPER_TICK_TIME": "2000"}}}
+    ],
+    "edges": [
+      {"id": "e-sa-pg", "source": "svc-springboot-1", "target": "svc-postgresql-2", "type": "dependency"},
+      {"id": "e-sa-redis", "source": "svc-springboot-1", "target": "svc-redis-3", "type": "dependency"},
+      {"id": "e-sa-kafka", "source": "svc-springboot-1", "target": "svc-kafka-4", "type": "dependency"},
+      {"id": "e-kafka-zk", "source": "svc-kafka-4", "target": "svc-zookeeper-5", "type": "dependency"},
+      {"id": "e-nginx-sa", "source": "svc-nginx-0", "target": "svc-springboot-1", "type": "dependency"}
+    ]
+  },
+  "composeYaml": ""
+}
